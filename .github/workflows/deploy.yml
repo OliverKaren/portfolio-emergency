@@ -1,0 +1,29 @@
+name: Emergency Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test Docker Build
+        run: |
+          docker build -t team-portal .
+          echo "✅ Docker build successful!"
+
+      - name: Test Compose
+        run: |
+          docker-compose up -d
+          sleep 5
+          curl http://localhost:3000/health || exit 1
+          echo "✅ Services are healthy!"
+
+      - name: Deploy Status
+        run: |
+          echo "🚀 READY FOR PRODUCTION!"
+          echo "Deploy command: docker-compose up -d"
